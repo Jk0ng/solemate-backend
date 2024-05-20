@@ -36,7 +36,7 @@ RSpec.describe "Shoes", type: :request do
 
   describe "POST /create" do 
     it "creates a shoe" do
-      #the params sent witht he request
+      #the params sent with the request
       shoe_params = {
         shoe: { 
           name: 'Nike Air Force',
@@ -48,7 +48,7 @@ RSpec.describe "Shoes", type: :request do
       # send the request to server with params
       post '/shoes', params: shoe_params
 
-      #assure get a success back
+      #assure getting a success back
       expect(response).to have_http_status(200)
 
       shoe=Shoe.first
@@ -67,9 +67,11 @@ RSpec.describe "Shoes", type: :request do
           image: 'https://live.staticflickr.com/8498/8341734396_76195b59bd_b.jpg'
         }
       }
+    # create a shoe example to be updated:
     post '/shoes', params: shoe_params
-    shoe = Shoe.first
+    shoe = Shoe.first 
 
+    # new paramters for the updating the shoe exmple created above
     updated_params = {
       shoe: {
         name: 'Nike Jordan 100',
