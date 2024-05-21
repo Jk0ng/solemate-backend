@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Shoes", type: :request do
-  describe "GET /index" do
+  describe "GET/index" do
     it "gets a list of shoes" do 
       Shoe.create(
         [
@@ -34,7 +34,7 @@ RSpec.describe "Shoes", type: :request do
     end
   end
 
-  describe "POST /create" do 
+  describe "POST/create" do 
     it "creates a shoe" do
       #the params sent with the request
       shoe_params = {
@@ -57,7 +57,7 @@ RSpec.describe "Shoes", type: :request do
     end
   end
 
-  describe "PUT /update" do 
+  describe "PUT/update" do 
     it "updates a pair of shoe" do
       shoe_params = {
         shoe: {
@@ -106,4 +106,75 @@ RSpec.describe "Shoes", type: :request do
       expect(response).to have_http_status(200)
     end
   end
+
+  describe "POST/create" do 
+    it "cannot create a shoe without a name" do 
+      shoe_params = {
+        shoe:{ 
+            price: 200,
+            description:
+            "This shoe is the first signature shoe of the famous basketball player Michael Jordan and the first model of the Air Jordan series.",
+            image:
+            "https://live.staticflickr.com/8498/8341734396_76195b59bd_b.jpg"
+          }
+        }
+      # send the post request to the server to create a shoe example with the params #
+      post '/shoes', params: shoe_params
+      # expect an error if the params doesn't have a name #
+      expect(response.status).to eq 422 
+      # convert the JSON response into a Ruby Hash
+      json = JSON.parse(response.body) #
+      # return errors as an array, because there could be more than one validation failures on an attribut #
+      expect(json['name']).to include "can't be blank"
+    end
+
+    it "cannot create a shoe without a price" do
+      shoe_params = {
+        shoe:{
+          name: "Nike Jordan 1",
+          description: "This shoe is the first signature shoe of the famous basketball player Michael Jordan and the first model of the Air Jordan series.",
+          image: "https://live.staticflickr.com/8498/8341734396_76195b59bd_b.jpg"
+        }
+      }
+      
+      #send a post request# 
+      post '/shoes', params: shoe_params
+      expect(response.status).to eq 422
+      json = JSON.parse(response.body)
+      expect(json['price']).to include "can't be blank"
+    end
+    
+    it "cannot create a shoe without an image" do
+      shoe_params = {
+        shoe:{
+          name: "Nike Jordan 1",
+          price: 200,
+          description: "This shoe is the first signature shoe of the famous basketball player Michael Jordan and the first model of the Air Jordan series."
+        }
+      }
+      
+      post '/shoes', params: shoe_params
+      expect(response.status).to eq 422
+      json = JSON.parse(response.body)
+      expect(json['image']).to include "can't be blank"
+    end
+
+    it "cannot create a shoe with a description less than 10-characters" do
+      shoe_params = {
+        shoe:{
+          name: "Nike Jordan 1",
+          price: 200,
+          description: "<10 ch",
+          image: "https://live.staticflickr.com/8498/8341734396_76195b59bd_b.jpg"
+        }
+      }
+  
+      post '/shoes', params: shoe_params
+        expect(response.status).to eq 422
+        json = JSON.parse(response.body)
+        expect(json['description']).to eql(["is too short (minimum is 10 characters)"])
+    end
+  end
 end
+
+
